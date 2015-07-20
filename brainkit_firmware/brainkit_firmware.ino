@@ -8,25 +8,8 @@
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-//output 1--8 and 9--A8 and A9
-//output 2--4 and 6--A6 and A7
-//output 3--10 and 12--A10 and A11
-//output 4--A4 and A5
-//output 5--A3 and A2
-//output 6--A1 nd A0
-
-//top leftt--output 6
-
-//bottom left--output 5
-
-//top right--output 4
-
-//middle top right--output 3
-
-//midlle bottom right --otuput 2
 boolean resetReady=false;
 boolean allowOvercurrent=false;
-//bottom right--output 1
 boolean rampingDisable=false;
 float rampTime=10;
 float P_FACTOR=5;
@@ -87,9 +70,10 @@ void setup() {
     pinMode(highSide[i],INPUT);
     pinMode(lowSide[i],INPUT);
   }
-
+pinMode(13,INPUT);
+pinMode(3,INPUT);
 Timer1.initialize(50000*2);
-wdt_enable(WDTO_2S);
+wdt_enable(WDTO_4S);
 }
 
 void loop() {
@@ -148,6 +132,7 @@ void loop() {
           power[i]=0;
           Serial.println(command);  //make sure computer acknowledges command
         }
+//        delay(2);
         resetReady=true;
     }
     if (command > 1000 && command < 2000) { //tacs frequency set
@@ -161,21 +146,7 @@ void loop() {
 
   }
 
-    //        digitalPotWrite((byte)0,rset[0]);
-    //        delay(10);
-    //        digitalPotWrite((byte)1,rset[1]);
-    //        delay(10);
-    //         digitalPotWrite((byte)2,rset[2]);
-    //        delay(10);
-    //         digitalPotWrite((byte)3,rset[3]);
-    //        delay(10);
-    //         digitalPotWrite((byte)4,rset[4]);
-    //        delay(10);
-    //         digitalPotWrite((byte)5,rset[5]);
-    //        delay(10);
-    //         digitalPotWrite((byte)0,rset[0]);
-    //        delay(10);
-    //Serial.print(analogRead(highSide[0])-analogRead(lowSide[0]));
+   
     if (resetReady) {//system powering down
     boolean doReset=true;
     for (int i=0; i< 6;i++) {
@@ -188,8 +159,13 @@ void loop() {
       }
     }
       if (doReset) {
-        Serial.end();
-        asm volatile ("  jmp 0");  
+        Timer1.detachInterrupt();
+        digitalWrite(13,LOW);
+        digitalWrite(3,LOW);
+        pinMode(13,INPUT);
+        pinMode(3,INPUT);
+        
+        while (1==1) {}
       }
       }
     if (enableRamping) {
@@ -203,6 +179,7 @@ void loop() {
           }
         }
       }
+      
       if (millis() - lastRamp >=250) {
         for (int i=0; i< 6;i++) {
           
@@ -334,9 +311,10 @@ void timerIsr() {
 }
 
 void scanMode() {
-
+  pinMode(13,OUTPUT);
+  digitalWrite(13,LOW);
   for (int port=0; port< 6; port++) {
-    digitalPotWrite((byte)port+1,255);
+    digitalPotWrite((byte)port,255);
     // pinMode(2,INPUT);
     float accumulated=0;
     int reading1=0;

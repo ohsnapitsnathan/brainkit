@@ -20,6 +20,8 @@ def startStim(mode):
     ser.write(str(mode))
     while not succeeded and poll < 50 and mode != 300:
         theData=ser.readline()
+        print("Waiting for:"+str(mode))
+        print("Got:"+str(theData))
         if str(mode) in theData:
             succeeded=True
         poll=poll+1

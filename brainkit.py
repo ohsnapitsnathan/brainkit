@@ -323,7 +323,7 @@ def getPhysData(filename, winLength,thresh,mode): #get neurophys measures from a
            # print(str(len(el1)))
             epoch=[]
             keepRunning=True
-            while len(epoch) <  100 and keepRunning:
+            while len(epoch) <  (winLength*10) and keepRunning:
                 try:
                     line=lines[numtaken]
                     if  numtaken >=260:
@@ -689,9 +689,9 @@ while True:
                  fatalError=True
                  errors=errors+"ERROR: Sham probability not specified\n"
              if totalCurrent > 0:
-                errors=errors+"WARNING:Total current is not balanced. You will need to attach an electrode to the Arduino ground to absorb "+str(totalCurrent)+" mA of excess current\n"
+                errors=errors+"WARNING:Total current is not balanced. You will need to attach an electrode to pin #3 to absorb "+str(totalCurrent)+" mA of excess current\n"
              if totalCurrent < 0:
-                errors=errors+"WARNING:Total current is not balanced. You will need to attach an electrode to the Arduino 5 volt rail to absorb "+str(abs(totalCurrent))+" mA of excess current\n"
+                errors=errors+"WARNING:Total current is not balanced. You will need to attach an electrode to pin #13 to absorb "+str(abs(totalCurrent))+" mA of excess current\n"
              errorAbort=False
              if len(errors) > 0:
                 if fatalError:
